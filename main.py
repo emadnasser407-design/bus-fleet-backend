@@ -47,6 +47,8 @@ def update_driver_location(data: DriverLocationData):
         "data": payload
     }
 
+from datetime import datetime
+
 # 2. العامل يطلب أحدث موقع لأتوبيس خط السير
 @app.get("/get-location/{route_id}")
 def get_bus_location(route_id: str):
@@ -54,9 +56,25 @@ def get_bus_location(route_id: str):
     if not bus_location:
         return {
             "status": "waiting",
-            "message": "السائق لم يبدأ الرحلة بعد أو لا يوجد موقع متاحة حالياً لهذا الخط",
+            "message": "السائق لم يبدأ الرحلة بعد",
             "route_id": route_id
         }
+    
+    # حساب الفرق بين الوقت الحالي ووقت آخر إرسال من السائق
+    last_update_str = bus_location.get("updated_at")
+    if last_update_str:
+        last_update_time = datetime.fromisoformat(last_update_str)
+        time_difference = (datetime.now() - last_update_time).total_seconds()
+        
+        # لو فات أكتر من 30 ثانية من غير إرسال يعتبر غير متصل
+        if time_difference > 30:
+            return {
+                "status": "offline",
+                "message": "الأتوبيس متوقف أو غير متصل حالياً",
+                "route_id": route_id,
+                "data": bus_location
+            }
+
     return {
         "status": "active",
         "route_id": route_id,
