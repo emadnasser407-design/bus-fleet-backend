@@ -1,9 +1,20 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict
 from datetime import datetime
 
+# إعداد التطبيق
 app = FastAPI(title="Bus Fleet Tracking API")
+
+# سماح للمتصفح بالاتصال بدون قيود CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # هيكل بيانات موقع السائق
 class DriverLocationData(BaseModel):
