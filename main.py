@@ -80,19 +80,28 @@ def get_bus_location(route_id: str):
         "route_id": route_id,
         "data": bus_location
     }
-# قائمة افتراضية لخطوط السير المتاحة
-available_routes = ["route_october", "route_zayed", "route_10th"]
+# قائمة تخزين الخطوط تبدأ فارغة لتضيفها من التطبيق بالعربي
+routes_db = []
 
-# 1. جلب قائمة الخطوط المتاحة للعمال والسائقين
+# جلب قائمة الخطوط
 @app.get("/api/routes")
 def get_routes():
-    return {"routes": available_routes}
+    return {"routes": routes_db}
 
-# 2. إضافة خط سير جديد بواسطة الآدمن
+# إضافة خط سير جديد بواسطة الأدمن بالعربي
 @app.post("/api/admin/add-route")
 def add_route(route_name: str):
-    if route_name not in available_routes:
-        available_routes.append(route_name)
-        return {"message": f"تم إضافة الخط {route_name} بنجاح", "routes": available_routes}
-    return {"message": "الخط موجود مسبقاً", "routes": available_routes}
+    clean_name = route_name.strip()
     
+    if not clean_name:
+        return {"status": "error", "message": "اسم الخط غير صالح"}
+        
+    if clean_name in routes_db:
+        return {"status": "error", "message": "الخط موجود بالفعل", "routes": routes_db}
+        
+    routes_db.append(clean_name)
+    return {
+        "status": "success", 
+        "message": f"تمت إضافة الخط {clean_name} بنجاح", 
+        "routes": routes_db
+    }
