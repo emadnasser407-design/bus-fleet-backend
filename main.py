@@ -101,7 +101,7 @@ def add_route(route_name: str):
         
     routes_db.append(clean_name)
     return {
-        "status": "success", 
+        "status": "success",  
         "message": f"تمت إضافة الخط {clean_name} بنجاح", 
         "routes": routes_db
     }
